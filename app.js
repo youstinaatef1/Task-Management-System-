@@ -12,10 +12,13 @@ mongoose.connect("mongodb://127.0.0.1:27017/projectNode")
 })
 app.use(express.json());
 const User = require("./models/User");
-// const { route } = require("./routes/userRoutes");
-const userRoutes = require("./routes/userRoutes");
-app.use("/api", userRoutes); 
+const Providers = require("./models/Providers");
 
+const { route } = require("./routes/userRoutes");
+const userRoutes = require("./routes/userRoutes");
+const providerRoutes = require("./routes/providerRoutes");
+app.use("/api", userRoutes); 
+app.use("/api", providerRoutes);
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is Running ${port}`);

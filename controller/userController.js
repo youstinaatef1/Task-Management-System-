@@ -2,11 +2,15 @@ const { models } = require("mongoose");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-
+const registerSchema = require("./validation/registerSchema");
 const register = async(req, res) => {
      try{
-        const{userName, email, password, role} = req.body;
-        if(!userName || !email || !password) return res.status(400).json({ msg: "Missing Data"});
+         const{userName, email, password, role} = req.body;
+        // if(!userName || !email || !password) return res.status(400).json({ msg: "Missing Data"});
+        const { error, value } = registerSchema.validate(req.body, {
+        abortEarly: false,
+        stripUnknown: true
+        })
         const exitUser = await User.findOne({email});
         if (exitUser) return res.status(400).json({ msg: "Account Already Exist"});
        
