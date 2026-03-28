@@ -7,6 +7,6 @@ const providerSchema = Joi.object({
     price: Joi.number().required(),
     completedJobs: Joi.number().required(),
     experience: Joi.string(),
-    userId: Joi.string().required()
+    // userId: Joi.string().required()
 });
 module.exports = providerSchema;

@@ -1,38 +1,50 @@
 const { models } = require("mongoose");
+const mongoose = require("mongoose");
 const Providers = require("../models/Providers");
 const Review = require("../models/Review");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const providerSchema = require("./validation/providerSchema");
-const register = async(req, res) => {
-     try{
-         const{name, email, password, price, completedJobs, experience} = req.body;
-        const { error, value } = providerSchema.validate(req.body, {
-        abortEarly: false,
-        stripUnknown: true
-        })
-        const exitProvider = await Providers.findOne({email});
-        if (exitProvider) return res.status(400).json({ msg: "Account Already Exist"});
-       
-        
-        const hashPassword = await bcrypt.hash(password, 10);
-        const provider = await Providers.create({
-         name,
-         email,
-         price,
-         password: hashPassword,
-         completedJobs,
-         experience
-})
-       res.status(201).json({
-        msg:"Done Created Provider",
-        data: provider
-});
+
+const register = async (req, res) => {
+  try {
+    if (!req.file)
+      return res.status(400).json({ msg: "Please Add Image" });
+    
+    const { error, value } = providerSchema.validate(req.body, {
+      abortEarly: false,
+      stripUnknown: true
+    });
+
+    if (error) {
+      return res.status(400).json({
+        msg: error.details.map((err) => err.message)
+      });
     }
-    catch(error){
-        console.log(error);
+
+    const { email, password } = value;
+
+    const exitProvider = await Providers.findOne({ email });
+    if (exitProvider) {
+      return res.status(400).json({ msg: "Account Already Exist" });
     }
-}
+
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    value.password = hashPassword;
+    value.image = req.file.path;
+
+    const provider = await Providers.create(value);
+
+    res.status(201).json({
+      msg: "Done Created Provider",
+      data: provider
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+};
 const login = async(req, res) => {
  try{
         const{email, password}= req.body;
@@ -67,26 +79,51 @@ const token = jwt.sign({
     }
 }
 const addReview = async (req, res) => {
-    try{
-        const { userId, providerId, rating, comment } = req.body;
+    try {
+        const { providerId, rating, comment } = req.body;
+        const userId = req.user.id; 
+
+        const existingReview = await Review.findOne({
+            user: userId,      
+            provider: providerId 
+        });
+
+        if (existingReview) {
+            return res.status(400).json({ msg: "You already reviewed this provider" });
+        }
+
         const review = new Review({
-            userId,
-            providerId,
+            user: userId,      
+            provider: providerId, 
             rating,
             comment
         });
 
         await review.save();
-
         res.status(201).json(review);
 
-    }catch(error){
-        res.status(500).json({message:error.message});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
     }
 }
+const getProviderReviews = async (req, res) => {
+    try {
+        const { providerId } = req.params;
 
+        const reviews = await Review.find({ provider: providerId })
+            .populate("user", "userName")
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(reviews);
+
+    } catch (error) {
+        res.status(500).json({ msg: "Error", error });
+    }
+};
 module.exports = {
     register,
     login,
-    addReview
+    addReview,
+    getProviderReviews
 }

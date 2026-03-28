@@ -6,7 +6,6 @@ const registerSchema = require("./validation/registerSchema");
 const register = async(req, res) => {
      try{
          const{userName, email, password, role} = req.body;
-        // if(!userName || !email || !password) return res.status(400).json({ msg: "Missing Data"});
         const { error, value } = registerSchema.validate(req.body, {
         abortEarly: false,
         stripUnknown: true

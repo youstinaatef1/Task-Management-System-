@@ -17,6 +17,10 @@ const providerSchema = new mongoose.Schema({
         required: true,
         minlength: 6
     },
+    image:{
+        type: String,
+        required: true
+    },
     price:{
         type: Number,
         required: true
@@ -28,23 +32,9 @@ const providerSchema = new mongoose.Schema({
     experience:{
         type: String,
     }
+
 },{timestamps: true});
-// const reviewSchema = new mongoose.Schema({
-//     user:{
-//         type:mongoose.Schema.Types.ObjectId,
-//         ref: "User"
-//     },
-//     provider:{
-//          type: mongoose.Schema.Types.ObjectId,
-//          ref:"Providers"
-//     },
-//     rating:{
-//         type:Number,
-//         min:1,
-//         max:5
-//     },
-//     comment:String
-// },{timestamps: true});
+
 //create model
 const Providers = mongoose.model("Providers" ,providerSchema);
 //export
