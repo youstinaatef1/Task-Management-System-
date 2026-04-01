@@ -2,6 +2,7 @@ const { models } = require("mongoose");
 const mongoose = require("mongoose");
 const Providers = require("../models/Providers");
 const Review = require("../models/Review");
+const Booking = require("../models/Booking");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const providerSchema = require("./validation/providerSchema");
@@ -82,7 +83,17 @@ const addReview = async (req, res) => {
     try {
         const { providerId, rating, comment } = req.body;
         const userId = req.user.id; 
+ const completedBooking = await Booking.findOne({
+            userId: userId,
+            providerId: providerId,
+            status: "completed"
+        });
 
+        if (!completedBooking) {
+            return res.status(400).json({ 
+                msg: "You can only review a provider after completing a booking with them" 
+            });
+        }
         const existingReview = await Review.findOne({
             user: userId,      
             provider: providerId 
@@ -121,9 +132,20 @@ const getProviderReviews = async (req, res) => {
         res.status(500).json({ msg: "Error", error });
     }
 };
+
+const getAllProviders = async (req, res) => {
+    try {
+        const providers = await Providers.find();
+        res.status(200).json({ data: providers});
+    } catch (error) {
+        res.status(500).json({ msg: "Error", error });
+
+    }
+}
 module.exports = {
     register,
     login,
     addReview,
-    getProviderReviews
+    getProviderReviews,
+    getAllProviders
 }

@@ -1,9 +1,13 @@
 const mongoose = require("mongoose");
 const bookSchema = new mongoose.Schema({
+    // userId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Users"
+    // }
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Users"
-    },
+         type: mongoose.Schema.Types.ObjectId, 
+         ref: "User" 
+        },
     providerId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Providers"
