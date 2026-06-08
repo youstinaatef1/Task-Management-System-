@@ -28,6 +28,13 @@ jobs:
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v3
 
+             
+            - name: Debug PATH
+              run: |
+                echo $PATH
+                which terraform
+                terraform version 
+
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v4
               with:
