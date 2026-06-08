@@ -28,12 +28,6 @@ jobs:
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v3
 
-            - name: Debug PATH
-              run: |
-                echo $PATH
-                which terraform
-                terraform version  
-
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v4
               with:
@@ -42,16 +36,20 @@ jobs:
                 aws-region: eu-west-1
 
             - name: Infra initiate
+              working-directory: ./infra
               run: terraform init
 
             - name: Terraform plan
               if: ${{ github.event.inputs.action == 'plan' }}
+              working-directory: ./infra
               run: terraform plan
 
             - name: Terraform apply
               if: ${{ github.event.inputs.action == 'apply' }}
+              working-directory: ./infra
               run: terraform apply -auto-approve
 
             - name: Terraform destroy
               if: ${{ github.event.inputs.action == 'destroy' }}
+              working-directory: ./infra
               run: terraform destroy -auto-approve
