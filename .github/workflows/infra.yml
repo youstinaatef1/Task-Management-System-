@@ -27,6 +27,7 @@ jobs:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID}}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
             aws-region: eu-west-1
+        uses: little-core-labs/install-terraform@v2.0.0
         - name: Infra initiate
           run: terraform init
         - name: terraform apply
