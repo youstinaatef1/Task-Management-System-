@@ -1,5 +1,5 @@
 resource "aws_vpc" "main"{
-    cider_block = var.vpc_cider
+    cidr_block = var.vpc_cidr
     instance_tenancy = "default"
 
     tags = {

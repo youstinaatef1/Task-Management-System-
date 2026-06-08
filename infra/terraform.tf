@@ -1,2 +1,3 @@
-vpc_cider = "10.0.0.0/16"
-vpc_name = "digilians"
+provider "aws" {
+  region = "us-east-1"
+}
