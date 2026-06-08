@@ -1,35 +1,48 @@
 name: IaC Workflow (Terraform)
-run-name: terraform ${{ inputs.action }}
-on: 
+run-name: terraform ${{ github.event.inputs.action }}
+on:
     workflow_dispatch:
         inputs:
             action:
                 type: choice
+                description: Terraform action to perform
                 options:
                     - apply
                     - destroy
                     - plan
-                env: 
-                    type: choice
-                    options:
-                        - dev
-                        - prod
+            env:
+                type: choice
+                description: Target environment
+                options:
+                    - dev
+                    - prod
+
 jobs:
     terraform-action:
-        environment: ${{ inputs.env}}
-        run-on: ubuntu-latest
+        environment: ${{ github.event.inputs.env }}
+        runs-on: ubuntu-latest
         steps:
-        - name: Clone Github Repo
-          uses: actions/checkout@v6
-        - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID}}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-            aws-region: eu-west-1
-        uses: little-core-labs/install-terraform@v2.0.0
-        - name: Infra initiate
-          run: terraform init
-        - name: terraform apply
-          if: ${{inputs.action == 'apply'}}
-          run: terraform apply -auto-approve
+            - name: Clone Github Repo
+              uses: actions/checkout@v6
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws-region: eu-west-1
+
+            - name: Infra initiate
+              run: terraform init
+
+            - name: Terraform plan
+              if: ${{ github.event.inputs.action == 'plan' }}
+              run: terraform plan
+
+            - name: Terraform apply
+              if: ${{ github.event.inputs.action == 'apply' }}
+              run: terraform apply -auto-approve
+
+            - name: Terraform destroy
+              if: ${{ github.event.inputs.action == 'destroy' }}
+              run: terraform destroy -auto-approve
